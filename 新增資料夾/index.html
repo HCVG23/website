@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>社群網路圖</title>
+  <script src="https://unpkg.com/cytoscape@3.24.0/dist/cytoscape.min.js"></script>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #f4f4f4;
+      font-family: sans-serif;
+    }
+    #network-container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="network-container"></div>
+
+  <script>
+    function getQueryParam(key, defaultValue) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(key) || defaultValue;
+    }
+
+    const schoolCode = getQueryParam("school", "107");
+    const year = getQueryParam("year", "2024");
+    const nodeFile = `nodes_${schoolCode}_${year}.json`;
+    const edgeFile = `edges_${schoolCode}_${year}.json`;
+
+    Promise.all([
+      fetch(nodeFile).then(res => res.json()),
+      fetch(edgeFile).then(res => res.json())
+    ]).then(([nodes, edges]) => {
+      const cy = cytoscape({
+        container: document.getElementById("network-container"),
+        elements: [
+          ...nodes.map(n => ({ data: { id: n.id, label: n.label, description: n.description || "" } })),
+          ...edges.map(e => ({ data: { source: e.source, target: e.target } }))
+        ],
+        layout: { name: "cose" },
+        style: [
+          {
+            selector: "node",
+            style: {
+              "label": "data(label)",
+              "background-color": "#667eea",
+              "color": "#fff",
+              "text-valign": "center",
+              "text-halign": "center",
+              "font-size": "12px",
+              "width": 40,
+              "height": 40
+            }
+          },
+          {
+            selector: "edge",
+            style: {
+              "width": 2,
+              "line-color": "#aaa",
+              "curve-style": "bezier"
+            }
+          }
+        ]
+      });
+
+      cy.on("tap", "node", evt => {
+        const node = evt.target;
+        alert(`【${node.data("label")}】\n${node.data("description")}`);
+      });
+    }).catch(err => {
+      document.getElementById("network-container").innerHTML = "<p style='padding:20px;color:red;'>載入資料失敗</p>";
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
