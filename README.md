@@ -1,1 +1,6 @@
 # website
+打開方式：
+打開CMD內
+cd到這個資料夾的位子EX:cd "C:\Users\USER\Desktop\新增資料夾"
+輸入: python -m http.server 8000
+去瀏覽器打開http://localhost:8000/分析.html
