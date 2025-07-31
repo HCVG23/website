@@ -1,4 +1,4 @@
-# website
+# 分析網站
 打開方式：
 打開CMD內
 cd到這個資料夾的位子EX:cd "C:\Users\USER\Desktop\新增資料夾"
